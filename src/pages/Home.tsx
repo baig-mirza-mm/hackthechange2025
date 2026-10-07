@@ -1,30 +1,10 @@
 import '../Home.css'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import type React from 'react'
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet'
 import * as L from 'leaflet'
 
 const API_URL = 'http://ec2-3-151-64-162.us-east-2.compute.amazonaws.com:3000';
-
-function DiscussionPost({
-  name = "INSERT NAME HERE",
-  comment = "INSERT COMMENT HERE",
-}) {
-  return (
-    <>
-      <div className="grid grid-cols-1 gap-4">
-        {/* User name and comment */}
-        <div className="text-left">
-          {/* Username */}
-          <p className="text-[1.4rem] font-semibold">{name}</p>
-          {/* User Comment */}
-          <p className="text-[1rem]">{comment}</p>
-        </div>
-      </div>
-      <hr className="m-2 border-gray-700" />
-    </>
-  )
-}
 
 const PinSelectionState = {
   // No pin is selected
@@ -52,11 +32,11 @@ L.Icon.Default.mergeOptions({
 
 type PinProps = { lat: number; lng: number; opacity?: number, onClick?, ticket }
 function Pin({ lat, lng, opacity = 1, onClick, ticket }: PinProps) {
-  const handleMarkerClick = useCallback((event) => {
+  const handleMarkerClick = (event) => {
     if (onClick) {
       onClick(event, { lat, lng, opacity, ticket });
     }
-  }, [onClick, { lat, lng, opacity, ticket }]);
+  };
   const markerEventHandlers = {
     click: handleMarkerClick,
   };
@@ -115,7 +95,7 @@ function HomePage() {
   })
 
   const [reloadPins, setReloadPins] = useState(0)
-  const { data: t, loading, error } = useApiData(`/api/issue/get_all?reload=${reloadPins}`);
+  const { data: t } = useApiData(`/api/issue/get_all?reload=${reloadPins}`);
 
   const pins = t && Array.isArray(t) ? t.map((tic) => {
     if (tic.latitude == null || tic.longitude == null) {
@@ -303,7 +283,7 @@ function HomePage() {
                       }
 
                       try {
-                        const res = await fetch(`${API_URL}/api/issue/post`, {
+                        await fetch(`${API_URL}/api/issue/post`, {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/json',
